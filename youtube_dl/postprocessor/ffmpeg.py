@@ -210,7 +210,13 @@ class FFmpegPostProcessor(PostProcessor):
         oldest_mtime = min(
             os.stat(encodeFilename(path)).st_mtime for path in input_paths)
 
-        opts += self._configuration_args()
+        for i in self._configuration_args():
+            if i == '-mono':
+                opts += ['-ac', '1']
+            elif i == '-stereo':
+                opts += ['-ac', '2']
+            else:
+                opts += [i]
 
         files_cmd = []
         for path in input_paths:
