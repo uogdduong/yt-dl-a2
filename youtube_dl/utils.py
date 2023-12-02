@@ -2121,7 +2121,7 @@ def sanitize_filename(s, restricted=False, is_id=False):
         if restricted and (char in '!&\'()[]{}$;`^,#' or char.isspace()):
             return '_'
         if restricted and ord(char) > 127:
-            return '_'
+            return '' if unicodedata.category(char)[0] in 'CM' else '_'
         return char
 
     # Replace look-alike Unicode glyphs
@@ -2130,6 +2130,10 @@ def sanitize_filename(s, restricted=False, is_id=False):
     # Handle timestamps
     s = re.sub(r'[0-9]+(?::[0-9]+)+', lambda m: m.group(0).replace(':', '_'), s)
     result = ''.join(map(replace_insane, s))
+    
+    if not result and s:
+        result = "null"
+       
     if not is_id:
         while '__' in result:
             result = result.replace('__', '_')
